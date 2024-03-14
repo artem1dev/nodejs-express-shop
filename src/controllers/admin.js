@@ -1,6 +1,5 @@
-const mongoose = require("mongoose");
+const { validationResult } = require("express-validator");
 const fileHelper = require("../util/file");
-const { validationResult } = require("express-validator/check");
 const Product = require("../models/product");
 
 exports.getAddProduct = (req, res, next) => {
@@ -15,10 +14,10 @@ exports.getAddProduct = (req, res, next) => {
 };
 
 exports.postAddProduct = (req, res, next) => {
-    const title = req.body.title;
+    const { title } = req.body;
     const image = req.file;
-    const price = req.body.price;
-    const description = req.body.description;
+    const { price } = req.body;
+    const { description } = req.body;
     if (!image) {
         return res.status(422).render("admin/edit-product", {
             pageTitle: "Add Product",
@@ -26,9 +25,9 @@ exports.postAddProduct = (req, res, next) => {
             editing: false,
             hasError: true,
             product: {
-                title: title,
-                price: price,
-                description: description,
+                title,
+                price,
+                description,
             },
             errorMessage: "Attached file is not an image.",
             validationErrors: [],
@@ -44,9 +43,9 @@ exports.postAddProduct = (req, res, next) => {
             editing: false,
             hasError: true,
             product: {
-                title: title,
-                price: price,
-                description: description,
+                title,
+                price,
+                description,
             },
             errorMessage: errors.array()[0].msg,
             validationErrors: errors.array(),
@@ -56,10 +55,10 @@ exports.postAddProduct = (req, res, next) => {
     const imageUrl = image.path;
 
     const product = new Product({
-        title: title,
-        price: price,
-        description: description,
-        imageUrl: imageUrl,
+        title,
+        price,
+        description,
+        imageUrl,
         userId: req.user,
     });
     product
@@ -90,7 +89,7 @@ exports.getEditProduct = (req, res, next) => {
                 pageTitle: "Edit Product",
                 path: "/admin/edit-product",
                 editing: editMode,
-                product: product,
+                product,
                 hasError: false,
                 errorMessage: null,
                 validationErrors: [],

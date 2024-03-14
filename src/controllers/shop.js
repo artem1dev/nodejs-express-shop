@@ -2,9 +2,7 @@ const fs = require("fs");
 const path = require("path");
 require("dotenv").config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
-
 const PDFDocument = require("pdfkit");
-
 const Product = require("../models/product");
 const Order = require("../models/order");
 
@@ -47,7 +45,7 @@ exports.getProduct = (req, res, next) => {
     Product.findById(prodId)
         .then((product) => {
             res.render("shop/product-detail", {
-                product: product,
+                product,
                 pageTitle: product.title,
                 path: "/products",
             });
@@ -100,7 +98,7 @@ exports.getCart = (req, res, next) => {
             res.render("shop/cart", {
                 path: "/cart",
                 pageTitle: "Your Cart",
-                products: products,
+                products,
             });
         })
         .catch((err) => {
@@ -165,15 +163,15 @@ exports.getCheckout = (req, res, next) => {
                         quantity: p.quantity,
                     };
                 }),
-                success_url: req.protocol + "://" + req.get("host") + "/checkout/success", // => http://localhost:3000
-                cancel_url: req.protocol + "://" + req.get("host") + "/checkout/cancel",
+                success_url: `${req.protocol}://${req.get("host")}/checkout/success`,
+                cancel_url: `${req.protocol}://${req.get("host")}/checkout/cancel`,
             });
         })
         .then((session) => {
             res.render("shop/checkout", {
                 path: "/checkout",
                 pageTitle: "Checkout",
-                products: products,
+                products,
                 totalSum: total,
                 sessionId: session.id,
             });
@@ -198,7 +196,7 @@ exports.getCheckoutSuccess = (req, res, next) => {
                     email: req.user.email,
                     userId: req.user,
                 },
-                products: products,
+                products,
             });
             return order.save();
         })
@@ -228,7 +226,7 @@ exports.postOrder = (req, res, next) => {
                     email: req.user.email,
                     userId: req.user,
                 },
-                products: products,
+                products,
             });
             return order.save();
         })
@@ -251,7 +249,7 @@ exports.getOrders = (req, res, next) => {
             res.render("shop/orders", {
                 path: "/orders",
                 pageTitle: "Your Orders",
-                orders: orders,
+                orders,
             });
         })
         .catch((err) => {
@@ -262,7 +260,7 @@ exports.getOrders = (req, res, next) => {
 };
 
 exports.getInvoice = (req, res, next) => {
-    const orderId = req.params.orderId;
+    const { orderId } = req.params;
     Order.findById(orderId)
         .then((order) => {
             if (!order) {
@@ -271,12 +269,12 @@ exports.getInvoice = (req, res, next) => {
             if (order.user.userId.toString() !== req.user._id.toString()) {
                 return next(new Error("Unauthorized"));
             }
-            const invoiceName = "invoice-" + orderId + ".pdf";
+            const invoiceName = `invoice-${orderId}.pdf`;
             const invoicePath = path.join("data", "invoices", invoiceName);
 
             const pdfDoc = new PDFDocument();
             res.setHeader("Content-Type", "application/pdf");
-            res.setHeader("Content-Disposition", 'inline; filename="' + invoiceName + '"');
+            res.setHeader("Content-Disposition", `inline; filename="${invoiceName}"`);
             pdfDoc.pipe(fs.createWriteStream(invoicePath));
             pdfDoc.pipe(res);
 
@@ -287,26 +285,11 @@ exports.getInvoice = (req, res, next) => {
             let totalPrice = 0;
             order.products.forEach((prod) => {
                 totalPrice += prod.quantity * prod.product.price;
-                pdfDoc.fontSize(14).text(prod.product.title + " - " + prod.quantity + " x " + "$" + prod.product.price);
+                pdfDoc.fontSize(14).text(`${prod.product.title} - ${prod.quantity} x ` + `$${prod.product.price}`);
             });
             pdfDoc.text("---");
-            pdfDoc.fontSize(20).text("Total Price: $" + totalPrice);
-
+            pdfDoc.fontSize(20).text(`Total Price: $${totalPrice}`);
             pdfDoc.end();
-            // fs.readFile(invoicePath, (err, data) => {
-            //   if (err) {
-            //     return next(err);
-            //   }
-            //   res.setHeader('Content-Type', 'application/pdf');
-            //   res.setHeader(
-            //     'Content-Disposition',
-            //     'inline; filename="' + invoiceName + '"'
-            //   );
-            //   res.send(data);
-            // });
-            // const file = fs.createReadStream(invoicePath);
-
-            // file.pipe(res);
         })
         .catch((err) => next(err));
 };

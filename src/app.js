@@ -12,7 +12,7 @@ const multer = require("multer");
 const errorController = require("./controllers/error");
 const User = require("./models/user");
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const { MONGODB_URI } = process.env.MONGODB_URI;
 
 const app = express();
 const store = new MongoDBStore({
@@ -26,7 +26,7 @@ const fileStorage = multer.diskStorage({
         cb(null, "images");
     },
     filename: (req, file, cb) => {
-        cb(null, new Date().toISOString() + "-" + file.originalname);
+        cb(null, `${new Date().toISOString()}-${file.originalname}`);
     },
 });
 
@@ -46,15 +46,15 @@ const shopRoutes = require("./routes/shop");
 const authRoutes = require("./routes/auth");
 
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single("image"));
+app.use(multer({ storage: fileStorage, fileFilter }).single("image"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/images", express.static(path.join(__dirname, "images")));
 app.use(
     session({
-        secret: "my secret",
+        secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
-        store: store,
+        store,
     }),
 );
 app.use(csrfProtection);
@@ -67,7 +67,6 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-    // throw new Error('Sync Dummy');
     if (!req.session.user) {
         return next();
     }
@@ -93,8 +92,6 @@ app.get("/500", errorController.get500);
 app.use(errorController.get404);
 
 app.use((error, req, res, next) => {
-    // res.status(error.httpStatusCode).render(...);
-    // res.redirect('/500');
     res.status(500).render("500", {
         pageTitle: "Error!",
         path: "/500",
@@ -105,7 +102,7 @@ app.use((error, req, res, next) => {
 mongoose
     .connect(MONGODB_URI)
     .then((result) => {
-        app.listen(3000);
+        app.listen(process.env.PORT);
     })
     .catch((err) => {
         console.log(err);

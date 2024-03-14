@@ -4,7 +4,7 @@ const deleteProduct = (btn) => {
 
     const productElement = btn.closest("article");
 
-    fetch("/admin/product/" + prodId, {
+    fetch(`/admin/product/${prodId}`, {
         method: "DELETE",
         headers: {
             "csrf-token": csrf,
