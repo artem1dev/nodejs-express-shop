@@ -12,19 +12,11 @@ Before you begin, ensure you have Node.js version 18.16.0 or later installed on 
 
 ## Getting Started
 
-To get started with the project, follow these steps:
+To get started with the project, you need to install all dependencies:
 
-1. Clone the repository from GitHub:
-
-   ```bash
-   git clone <repository_url>
-   ```
-
-2. Install all dependencies:
-
-   ```bash
-   npm install
-   ```
+  ```bash
+  npm install
+  ```
 
 ## Environment Configuration
 

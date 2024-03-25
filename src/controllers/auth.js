@@ -66,7 +66,6 @@ exports.postLogin = (req, res, next) => {
             errorMessage: errors.array()[0].msg,
             oldInput: {
                 email,
-                password,
             },
             validationErrors: errors.array(),
         });
@@ -81,7 +80,6 @@ exports.postLogin = (req, res, next) => {
                     errorMessage: "Invalid email or password.",
                     oldInput: {
                         email,
-                        password,
                     },
                     validationErrors: [],
                 });
@@ -91,7 +89,12 @@ exports.postLogin = (req, res, next) => {
                 .then((doMatch) => {
                     if (doMatch) {
                         req.session.isLoggedIn = true;
-                        req.session.user = user;
+                        req.session.user = {
+                            email: user.email,
+                            resetToken: user.resetToken,
+                            resetTokenExpiration: user.resetTokenExpiration,
+                            cart: user.cart,
+                        };
                         return req.session.save((err) => {
                             console.log(err);
                             res.redirect("/");
@@ -103,7 +106,6 @@ exports.postLogin = (req, res, next) => {
                         errorMessage: "Invalid email or password.",
                         oldInput: {
                             email,
-                            password,
                         },
                         validationErrors: [],
                     });
@@ -133,8 +135,6 @@ exports.postSignup = (req, res, next) => {
             errorMessage: errors.array()[0].msg,
             oldInput: {
                 email,
-                password,
-                confirmPassword: req.body.confirmPassword,
             },
             validationErrors: errors.array(),
         });
