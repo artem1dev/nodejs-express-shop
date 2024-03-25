@@ -2,7 +2,8 @@ const adminRoutes = require("./admin");
 const shopRoutes = require("./shop");
 const authRoutes = require("./auth");
 const errorController = require("../controllers/error");
-const User = require("../models/user");
+const User = require("../models/user.methods");
+const { StatusCodes } = require("http-status-codes");
 
 class AppRouter {
     constructor(app) {
@@ -37,7 +38,7 @@ class AppRouter {
         this.app.get("/500", errorController.get500);
         this.app.use(errorController.get404);
         this.app.use((error, req, res, next) => {
-            res.status(500).render("500", {
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).render("500", {
                 pageTitle: "Error!",
                 path: "/500",
                 isAuthenticated: req.session.isLoggedIn,
