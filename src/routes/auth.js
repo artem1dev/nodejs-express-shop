@@ -1,25 +1,26 @@
 const express = require("express");
 const authController = require("../controllers/auth");
 const { checkOnLogin, checkOnSignUp } = require("../validations/auth.validation");
+const tryCatch = require("../middleware/tryCatch");
 
 const router = express.Router();
 
-router.get("/login", authController.getLogin);
+router.get("/login", tryCatch(authController.getLogin));
 
-router.get("/signup", authController.getSignup);
+router.get("/signup", tryCatch(authController.getSignup));
 
-router.post("/login", checkOnLogin, authController.postLogin);
+router.post("/login", checkOnLogin, tryCatch(authController.postLogin));
 
-router.post("/signup", checkOnSignUp, authController.postSignup);
+router.post("/signup", checkOnSignUp, tryCatch(authController.postSignup));
 
-router.post("/logout", authController.postLogout);
+router.post("/logout", tryCatch(authController.postLogout));
 
-router.get("/reset", authController.getReset);
+router.get("/reset", tryCatch(authController.getReset));
 
-router.post("/reset", authController.postReset);
+router.post("/reset", tryCatch(authController.postReset));
 
-router.get("/reset/:token", authController.getNewPassword);
+router.get("/reset/:token", tryCatch(authController.getNewPassword));
 
-router.post("/new-password", authController.postNewPassword);
+router.post("/new-password", tryCatch(authController.postNewPassword));
 
 module.exports = router;

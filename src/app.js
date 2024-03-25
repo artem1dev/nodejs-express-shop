@@ -56,9 +56,5 @@ app.use(flash());
 const router = new AppRouter(app);
 router.init();
 
-mongoose
-    .connect(MONGODB_URI)
-    .then((result) => {
-        app.listen(process.env.PORT);
-    })
-    .catch((err) => {});
+mongoose.connect(MONGODB_URI);
+app.listen(process.env.PORT)

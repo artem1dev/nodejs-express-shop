@@ -1,30 +1,30 @@
-const path = require("path");
 const express = require("express");
 const shopController = require("../controllers/shop");
 const isAuth = require("../middleware/is-auth");
+const tryCatch = require("../middleware/tryCatch");
 
 const router = express.Router();
 
-router.get("/", shopController.getIndex);
+router.get("/", tryCatch(shopController.getIndex));
 
-router.get("/products", shopController.getProducts);
+router.get("/products", tryCatch(shopController.getProducts));
 
-router.get("/products/:productId", shopController.getProduct);
+router.get("/products/:productId", tryCatch(shopController.getProduct));
 
-router.get("/cart", isAuth, shopController.getCart);
+router.get("/cart", isAuth, tryCatch(shopController.getCart));
 
-router.post("/cart", isAuth, shopController.postCart);
+router.post("/cart", isAuth, tryCatch(shopController.postCart));
 
-router.post("/cart-delete-item", isAuth, shopController.postCartDeleteProduct);
+router.post("/cart-delete-item", isAuth, tryCatch(shopController.postCartDeleteProduct));
 
-router.get("/checkout", isAuth, shopController.getCheckout);
+router.get("/checkout", isAuth, tryCatch(shopController.getCheckout));
 
-router.get("/checkout/success", shopController.getCheckoutSuccess);
+router.get("/checkout/success", tryCatch(shopController.getCheckoutSuccess));
 
-router.get("/checkout/cancel", shopController.getCheckout);
+router.get("/checkout/cancel", tryCatch(shopController.getCheckout));
 
-router.get("/orders", isAuth, shopController.getOrders);
+router.get("/orders", isAuth, tryCatch(shopController.getOrders));
 
-router.get("/orders/:orderId", isAuth, shopController.getInvoice);
+router.get("/orders/:orderId", isAuth, tryCatch(shopController.getInvoice));
 
 module.exports = router;
